@@ -3,6 +3,6 @@ import assert from 'assert';
 
 describe('greet user', () => {
     it("Should equal 'Hello, MonaKecil!", () => {
-        assert.equal(greet('MonaKecil'), 'Hello, MonaKecil!')
+        assert.strictEqual(greet('MonaKecil'), 'Hello, MonaKecil!')
     })
 })

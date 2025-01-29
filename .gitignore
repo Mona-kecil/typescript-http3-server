@@ -1,8 +1,14 @@
+# Ignore js files
+*.js
+*.js.map
+*.d.ts
+
 # Nodejs projects
 node_modules
 
 # Build
-dist
+dist/
+build/
 
 # IDE
 .idea
