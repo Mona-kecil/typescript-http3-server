@@ -24,29 +24,35 @@ export class MonProtocolServer {
     constructor(port: number) {
         this.port = port
         this.server = net.createServer((client) => {
-            console.log('Client connected')
-
-            client.on('data', (data) => {
-                const buf = data.toString()
-                const bufs = parseBuffer(buf)
-
-                if (bufs === null) {
-                    client.write("invalid data format\r\n")
-                    return
-                }
-
-                const length = bufs[1]
-                const message = Buffer.allocUnsafe(length)
-                message.write(bufs[2], 0)
-
-                client.write(`MON /OK\r\n${message}`)
-            })
-
-            client.on('end', () => {
-                console.log('Client disconnected')
-            })
+            this.handleConnection(client)
         })
-        this.server.listen(this.port)
+    }
+
+    private handleConnection(client: net.Socket) {
+        let buf: Buffer = Buffer.allocUnsafe(0)
+
+        client.on('data', (chunk) => {
+            buf = Buffer.concat([buf, chunk])
+            const bufs = parseBuffer(buf.toString())
+
+            if (bufs === null) {
+                client.write("Invalid data format\r\n")
+                return
+            }
+
+            const length = bufs[1]
+            const message = Buffer.allocUnsafe(length)
+            message.write(bufs[2], 0)
+
+            client.write(`MON /OK\r\n${message}`)
+
+        })
+    }
+
+    public start() {
+        this.server.listen(this.port, () => {
+            console.log('Server started')
+        })
     }
 
     public stop() {

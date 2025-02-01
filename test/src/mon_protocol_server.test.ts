@@ -8,6 +8,7 @@ describe("MonProtocolServer", () => {
 
     beforeEach(() => {
         server = new MonProtocolServer(12345)
+        server.start()
     })
     afterEach(() => {
         server.stop()
