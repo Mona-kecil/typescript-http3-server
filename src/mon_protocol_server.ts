@@ -33,7 +33,7 @@ export class MonProtocolServer {
 
         client.on('data', (chunk) => {
             buf = Buffer.concat([buf, chunk])
-            const bufs = parseBuffer(buf.toString())
+            const bufs = parseBuffer(buf)
 
             if (bufs === null) {
                 client.write("Invalid data format\r\n")
@@ -62,19 +62,43 @@ export class MonProtocolServer {
     }
 }
 
-function parseBuffer(buf: string): CustomBuffer | null {
-    const bufs = buf.split('\r\n')
-    bufs.length = 3
+function parseBuffer(buf: Buffer): CustomBuffer | null {
+    const first_break = buf.indexOf("\r\n")
+    if (first_break === -1) return null
 
-    if (bufs.length < 3) {
-        return null
-    }
+    const header = buf.subarray(0, first_break)
+    if (header.toString() !== "MON") return null
 
-    if (bufs[0] !== "MON") {
-        return null
-    }
+    const second_break = buf.indexOf("\r\n", first_break + 2)
+    if (second_break === -1) return null
 
-    return [bufs[0], parseInt(bufs[1]), bufs[2]] as CustomBuffer
+    const message_length = buf.subarray(first_break + 2, second_break)
+    if (isNaN(parseInt(message_length.toString()))) return null
+
+    const third_break = buf.indexOf("\r\n", second_break + 2)
+    if (third_break === -1) return null
+
+    const message = buf.subarray(second_break + 2, third_break)
+    return [
+        header.toString(),
+        parseInt(message_length.toString()),
+        message.toString()
+    ]
 }
 
-type CustomBuffer = ["MON", number, string]
+//function parseBuffer(buf: string): CustomBuffer | null {
+//    const bufs = buf.split('\r\n')
+//    bufs.length = 3
+//
+//    if (bufs.length < 3) {
+//        return null
+//    }
+//
+//    if (bufs[0] !== "MON") {
+//        return null
+//    }
+//
+//    return [bufs[0], parseInt(bufs[1]), bufs[2]] as CustomBuffer
+//}
+
+type CustomBuffer = [string, number, string]
