@@ -44,7 +44,7 @@ export class MonProtocolServer {
             const message = Buffer.allocUnsafe(length)
             message.write(bufs[2], 0)
 
-            client.write(`MON /OKE\r\n${message}`)
+            client.write(`MON /OK\r\n${message}`)
 
         })
     }
