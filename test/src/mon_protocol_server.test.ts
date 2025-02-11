@@ -14,6 +14,7 @@ describe("MonProtocolServer", () => {
         server.stop()
     })
 
+    // Add one more test case, where header is not MON
     it("Should return 'Hi, mom' with 'MON /OK' as header", (done) => {
         const message = Buffer.from("Hi, mom")
         const length = message.byteLength
